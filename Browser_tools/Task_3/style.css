@@ -1,0 +1,40 @@
+﻿body{
+	min-width:900px;
+}
+*{
+	box-sizing: border-box;
+}
+.main-container{
+	width:800px;
+	margin:auto;
+	text-align:center;
+}
+.link-next{
+	background: url(img/next.png);
+	background-size: 100% 100%;
+	width:50px;
+	height:30px;
+	display:inline-block;
+	position:absolute;
+	right:0;
+}
+.link-prev{
+	background: url(img/prev.png);
+	background-size: 100% 100%;
+	width:50px;
+	height:30px;
+	display:inline-block;
+	position:absolute;
+	left:0;
+	background-size: 100% 100%;
+}
+.counter{
+	background: blue;
+	color:white;
+	display:inline-block;
+	position:absolute;
+	left: 200px;
+}
+.left{
+	text-align:left;
+}
