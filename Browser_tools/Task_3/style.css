@@ -38,3 +38,6 @@
 .left{
 	text-align:left;
 }
+abbr{
+cursor:pointer;
+}
