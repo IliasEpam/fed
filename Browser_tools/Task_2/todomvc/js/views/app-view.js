@@ -1,7 +1,7 @@
 /*global Backbone, jQuery, _, ENTER_KEY */
 var app = app || {};
 
-(function ($, console, foo, bar) {
+(function ($, foo, bar) {
 	'use strict';
 
 	// The Application
