@@ -11,7 +11,7 @@
 <script>
 window.onload = function(){
 	var textBlank = document.getElementById('test');
-	textBlank.innerHTML = 'размер с скролбаром ' + window.innerWidth + ' ' + window.innerHeight + '<br>размер без скролбара ' + window.document.documentElement.clientWidth + ' '+ window.document.documentElement.clientHeight;
+	setTimeout(function(){ textBlank.innerHTML = 'размер с скролбаром ' + window.innerWidth + ' ' + window.innerHeight + '<br>размер без скролбара ' + window.document.documentElement.clientWidth + ' '+ window.document.documentElement.clientHeight; }, 10);
 }
 </script>
 </body>
