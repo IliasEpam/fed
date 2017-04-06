@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<section class="main-container">
+	<p id="test"></p>
+	
+</section>
+
+<script>
+window.onload = function(){
+	var textBlank = document.getElementById('test');
+	textBlank.innerHTML = 'размер с скролбаром ' + window.innerWidth + ' ' + window.innerHeight + '<br>размер без скролбара ' + window.document.documentElement.clientWidth + ' '+ window.document.documentElement.clientHeight;
+}
+</script>
+</body>
+
+</html>

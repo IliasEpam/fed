@@ -4,7 +4,6 @@
 <link href="style.css" rel="stylesheet">
 </head>
 <body>
-<a class="link-next" href="win.html"></a>
 <p class="counter" id="counter"></p>
 <a class="link-prev" href="screen.html"></a>
 <section class="main-container">
@@ -21,10 +20,11 @@
 function openWin(){
  var width = document.getElementById('width').value;
  var height = document.getElementById('height').value;
- var newWin = window.open("about:blank", "hello", "width=100,height=100");
+ var newWin = window.open("newWin.html", "hello", "width=100,height=100");
  newWin.resizeTo(width,height);
- newWin.document.write('размер с скролбаром ' + newWin.innerWidth + ' ' + newWin.innerHeight + '<br>размер без скролбара ' + newWin.document.documentElement.clientWidth + ' '+ newWin.document.documentElement.clientHeight);
+ //newWin.document.write('размер с скролбаром ' + newWin.innerWidth + ' ' + newWin.innerHeight + '<br>размер без скролбара ' + newWin.document.documentElement.clientWidth + ' '+ newWin.document.documentElement.clientHeight);
 }
+
 </script>
 </body>
 
