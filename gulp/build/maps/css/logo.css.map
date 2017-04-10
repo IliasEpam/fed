@@ -1,0 +1,1 @@
+{"version":3,"sources":["logo.scss"],"names":[],"mappings":"AAAA,MACE,OAAA,KACA,iBAAA,0BACA,gBAAA,QACA,kBAAA","file":"../../logo.css","sourcesContent":[".logo {\n  height: 100%;\n  background-image: url(\"img/angular-logo.png\");\n  background-size: contain;\n  background-repeat: no-repeat;\n}\n"]}

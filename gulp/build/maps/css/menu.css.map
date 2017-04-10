@@ -1,0 +1,1 @@
+{"version":3,"sources":["menu.scss"],"names":[],"mappings":"AAAA,MACE,OAAA,KACA,iBAAA","file":"../../menu.css","sourcesContent":[".menu {\n  height: 100%;\n  background-color: #00FFFF;\n}\n"]}
