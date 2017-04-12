@@ -5,10 +5,11 @@ var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
 var source = require('vinyl-source-stream');
 var concat = require('gulp-concat');
-var rename = require('gulp-rename');
 var babelify = require('babelify');
 var buffer = require('vinyl-buffer');
 var util = require('gulp-util');
+/***didn't use***/
+var rename = require('gulp-rename');
 var vendor = require('gulp-concat-vendor');
 
 /**img plugins**/
@@ -18,19 +19,20 @@ var pngquant = require('imagemin-pngquant');
 var sass = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
 var cleanCSS = require('gulp-clean-css');
+var concatCss = require('gulp-concat-css');
  
  /**others**/
  var sourcemaps = require('gulp-sourcemaps');
  var webserver = require('gulp-webserver');
  
  
-gulp.task('default', ['imgs', 'css', 'html', 'webserver', 'js']);
+gulp.task('default', ['imgs', 'css', 'html', 'js', 'webserver']);
 
 gulp.task('webserver', function() {
   gulp.src('build')
     .pipe(webserver({
       livereload: true,
-      directoryListing: true,
+      directoryListing: false,
       open: true
     }));
 });
@@ -53,8 +55,9 @@ gulp.task('css', function(){
 	.pipe(sourcemaps.init())
 		.pipe(sass()) 
 		.pipe(autoprefixer(['last 15 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true })) 
+		.pipe(concatCss('app.css'))
 		.pipe(cleanCSS({compatibility: 'ie8'}))
-	.pipe(sourcemaps.write('maps/css'))
+	.pipe(sourcemaps.write(''))
 		.pipe(gulp.dest('build')) 
 });
 gulp.task('js', function(){
@@ -72,6 +75,6 @@ gulp.task('js', function(){
 	  .pipe(concat('app.js'))
 	  .pipe(uglify())
       .on('error', util.log)
-    .pipe(sourcemaps.write('maps/js'))
+    .pipe(sourcemaps.write(''))
     .pipe(gulp.dest('build'));
 });
