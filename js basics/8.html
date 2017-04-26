@@ -29,7 +29,7 @@
 			for(var i = someArray.length - 1; i >= 0; i--){
 				someArray.push(someArray[i]);
 			}
-			someArray = someArray.slice(someArray.length / 2);
+			someArray.splice(0, (someArray.length / 2));
 			return someArray;
 		}
 		else{
