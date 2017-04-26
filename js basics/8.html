@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	
+
+	<script>
+
+	function reverseArray(someArray){
+		if (Array.isArray(someArray)){
+			var reversedArray = [];
+			for(var i = someArray.length - 1; i >= 0; i--){
+				reversedArray.push(someArray[i]);
+				console.log(someArray[i]);
+				someArray.pop();
+			}
+			return reversedArray;
+		}
+		else{
+			return 'input is not an array';
+		}	
+	}
+	var reverseMe =[9, 8, 7, 6, 5, 4, 3];
+	function reverseArrayInPlace(someArray){
+		if (Array.isArray(someArray)){
+			for(var i = someArray.length - 1; i >= 0; i--){
+				someArray.push(someArray[i]);
+			}
+			someArray = someArray.slice(someArray.length / 2);
+			return someArray;
+		}
+		else{
+			return 'input is not an array';
+		}	
+	}
+
+	console.log(reverseArray([1,2,3]));
+
+	reverseArrayInPlace(reverseMe);
+	console.log(reverseMe);
+
+	</script>
+</body>
+</html>
