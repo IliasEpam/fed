@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	
+
+	<script>
+
+	function arrayToList(someArray){
+		if (Array.isArray(someArray)){
+			var someList = null;
+			for(var i = someArray.length - 1; i >= 0; i--){
+				someList = {value: someArray[i], rest: someList}
+			}
+			return someList;
+		}
+		else{
+			console.log('input is not an array');
+		}
+	}	
+	console.log(arrayToList([10, 20]));
+
+	function listToArray(someList){	
+		var someArray = [];
+		var tempList = someList;
+		while (tempList){
+			someArray.push(tempList.value);
+			tempList = tempList.rest;
+		}
+		return someArray;
+	}
+	var list = {value: 10, rest: {value: 20, rest: null}};
+	console.log(listToArray(list));
+
+	function prepend(val, someList){
+		someList = {value: val, rest: someList};
+		return someList;
+	}
+	console.log(prepend(10, prepend(20, null)));
+
+	function nth(someList, pos){
+		var tempList = someList;
+		var elem;
+		for (var i = 0; tempList; i++ ){
+			if (i == pos){
+				elem = tempList.value;
+			}
+			tempList = tempList.rest;
+		}
+		return elem;
+	}
+	console.log(nth(arrayToList([10, 20, 30]), 1));
+
+	</script>
+</body>
+</html>
