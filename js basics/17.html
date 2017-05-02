@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+
+    <script>
+        var text = "'23 times bla bla bl'a. Julia said: 'Hi there! shoudn't you be at work?' What a strange dialog.' \n 'hey hey hey' ";
+        console.log(text);
+        //console.log(text.replace(/(^'|'$)/g, '"').replace(/(\W)'/g, '$1"').replace(/'(\W)/g, '"$1'));
+        console.log(text.replace(/'($|\W)|(\W|^)'/g, '$2"$1'));
+    </script>
+</body>
+
+</html>
