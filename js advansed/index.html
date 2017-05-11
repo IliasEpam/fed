@@ -3,9 +3,23 @@
 
 <head>
     <meta charset="utf-8">
+    <style>
+        body {
+            padding: 20px;
+        }
+        
+        #world {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body>
+    <div id="world">
+    </div>
+    <button onclick="var alive = setInterval(world.alive.bind(world), 500);">Continue</button>
+    <button onclick="stopAlive()">Stop</button>
+
     <script>
         function Rock(x, y) {
             this.position = [x, y];
@@ -17,18 +31,14 @@
         Creatures.prototype.generatePosition = function(ifReproducing) {
             var varient;
             var acceptableChars = '_' + this.eats;
-            if (ifReproducing) {
+            if (ifReproducing || this.energy > this.energyToReproduction * 0.7) {
                 acceptableChars = '_';
+            } else if (this.energy < this.energyToReproduction * 0.1) {
+                acceptableChars = this.eats;
+                if (!(this.findPossiblePositions(acceptableChars))) {
+                    acceptableChars = '_';
+                }
             }
-            /*else if (this.energy < 20) {
-                           acceptableChars = this.eats;
-                           if (this.energy > 28) {
-                               acceptableChars = '_';
-                           }
-                           if (!(this.findPossiblePositions(acceptableChars))) {
-                               acceptableChars = '_';
-                           }
-                       }*/
 
             varient = this.findPossiblePositions(acceptableChars);
             return varient;
@@ -63,12 +73,13 @@
 
         }
         Creatures.prototype.act = function(actionPosition) {
+            var eatableArray;
             if (world.content[actionPosition[0]][actionPosition[1]] === this.eats) {
                 if (this instanceof Predators) {
-                    var eatableArray = plantEaters;
+                    eatableArray = plantEaters;
                 }
                 if (this instanceof PlantEaters) {
-                    var eatableArray = plants;
+                    eatableArray = plants;
                 }
                 for (var j = 0; j < eatableArray.length; j++) {
                     if (eatableArray[j].position[0] === actionPosition[0] && eatableArray[j].position[1] === actionPosition[1]) {
@@ -85,26 +96,22 @@
         }
         Creatures.prototype.reproduction = function() {
             var childPosition = this.generatePosition(true);
+            var Construction;
+            var speciesArray;
             if (this instanceof Predators) {
-                var speciesArray = predators;
+                speciesArray = predators;
+                Construction = Predators;
             }
             if (this instanceof PlantEaters) {
-                var speciesArray = plantEaters;
+                speciesArray = plantEaters;
+                Construction = PlantEaters;
             }
             if (this instanceof Plants) {
-                var speciesArray = plants;
+                speciesArray = plants;
+                Construction = Plants;
             }
             if (childPosition !== undefined) {
-                if (this instanceof Predators) {
-                    var construction = Predators;
-                }
-                if (this instanceof PlantEaters) {
-                    var construction = PlantEaters;
-                }
-                if (this instanceof Plants) {
-                    var construction = Plants;
-                }
-                child = new construction(childPosition[0], childPosition[1]);
+                child = new Construction(childPosition[0], childPosition[1]);
                 speciesArray.push(child);
                 this.energy /= 2;
                 world.content[childPosition[0]] = world.content[childPosition[0]].slice(0, childPosition[1]) + child.value + world.content[childPosition[0]].slice(childPosition[1] + 1);
@@ -114,10 +121,11 @@
         function Plants(x, y) {
             this.position = [x, y];
             this.value = '*';
-            this.energy = 10 * Math.random().toFixed(1);
+            this.energyToReproduction = 20;
+            this.energy = this.energyToReproduction * Math.random().toFixed(1);
             this.turn = function() {
-                this.energy += 0.5;
-                if (this.energy > 20) {
+                this.energy += 0.4;
+                if (this.energy > this.energyToReproduction) {
                     this.reproduction();
                 }
             }
@@ -127,16 +135,17 @@
 
         function Predators(x, y) {
             this.position = [x, y];
-            this.energy = 20 * Math.random().toFixed(1);
             this.value = 'a';
             this.eats = 'o';
+            this.energyToReproduction = 40;
+            this.energy = this.energyToReproduction * Math.random().toFixed(1);
             this.turn = function() {
-                this.energy -= 0.4;
+                this.energy -= 0.6;
                 var newPosition = this.generatePosition();
                 if (newPosition !== undefined) {
                     this.act(newPosition);
                 }
-                if (this.energy > 30) {
+                if (this.energy > this.energyToReproduction) {
                     this.reproduction();
                 }
                 if (this.energy < 0) {
@@ -153,16 +162,17 @@
 
         function PlantEaters(x, y) {
             this.position = [x, y];
-            this.energy = 20 * Math.random().toFixed(1);
+            this.energyToReproduction = 40;
+            this.energy = this.energyToReproduction * Math.random().toFixed(1);
             this.value = 'o';
             this.eats = '*';
             this.turn = function() {
-                this.energy -= 0.5;
+                this.energy -= 0.2;
                 var newPosition = this.generatePosition();
                 if (newPosition !== undefined) {
                     this.act(newPosition);
                 }
-                if (this.energy > 30) {
+                if (this.energy > this.energyToReproduction) {
                     this.reproduction();
                 }
                 if (this.energy < 0) {
@@ -180,6 +190,7 @@
             this.height = height;
             this.content = [];
             this.day = 0;
+            this.container = document.querySelector('#world');
             this.build = function() {
                 for (var i = 0; i < height; i++) {
                     var line = '';
@@ -213,7 +224,7 @@
                     }
                     this.content.push(line);
                 }
-                document.body.innerHTML = this.content.join('<br>');
+                this.container.innerHTML = this.content.join('<br>');
             }
             this.alive = function() {
                 for (var i = 0; i < plants.length; i++) {
@@ -226,17 +237,20 @@
                     predators[i].turn();
                 }
                 this.day++;
-                document.body.innerHTML = this.content.join('<br>');
+                this.container.innerHTML = this.content.join('<br>');
                 console.log('Day №' + this.day + ' plantEaters: ' + plantEaters.length + ' predators: ' + predators.length + ' plants: ' + plants.length);
             }
         }
         var world = new World(40, 20);
         world.build();
-        setInterval(function() {
-            world.alive();
-        }, 1000);
-        /*for debugging
-        for (var i = 0; plants.length; i++){if (plants[i].position[0] === actionPosition[0] && plants[i].position[1] === actionPosition[1]){console.log(plants.indexOf(plants[i]));}}*/
+        /* setInterval(function() {
+             world.alive();
+         }, 200);*/
+        var alive = setInterval(world.alive.bind(world), 1000);
+
+        function stopAlive() {
+            clearInterval(alive);
+        }
     </script>
 </body>
 
