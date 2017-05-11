@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <script>
+        function Rock(x, y) {
+            this.position = [x, y];
+            this.value = '#';
+        }
+        var rocks = [];
+
+        function Creatures() {}
+        Creatures.prototype.generatePosition = function(ifReproducing) {
+            var varient;
+            var acceptableChars = '_' + this.eats;
+            if (ifReproducing) {
+                acceptableChars = '_';
+            }
+            /*else if (this.energy < 20) {
+                           acceptableChars = this.eats;
+                           if (this.energy > 28) {
+                               acceptableChars = '_';
+                           }
+                           if (!(this.findPossiblePositions(acceptableChars))) {
+                               acceptableChars = '_';
+                           }
+                       }*/
+
+            varient = this.findPossiblePositions(acceptableChars);
+            return varient;
+        }
+        Creatures.prototype.findPossiblePositions = function(acceptableChars) {
+            var possiblePositions = [];
+            if (acceptableChars.indexOf(world.content[this.position[0] - 1][this.position[1] - 1]) >= 0) {
+                possiblePositions.push([this.position[0] - 1, this.position[1] - 1]);
+            }
+            if (acceptableChars.indexOf(world.content[this.position[0] - 1][this.position[1]]) >= 0) {
+                possiblePositions.push([this.position[0] - 1, this.position[1]]);
+            }
+            if (acceptableChars.indexOf(world.content[this.position[0] - 1][this.position[1] + 1]) >= 0) {
+                possiblePositions.push([this.position[0] - 1, this.position[1] + 1]);
+            }
+            if (acceptableChars.indexOf(world.content[this.position[0]][this.position[1] + 1]) >= 0) {
+                possiblePositions.push([this.position[0], this.position[1] + 1]);
+            }
+            if (acceptableChars.indexOf(world.content[this.position[0] + 1][this.position[1] + 1]) >= 0) {
+                possiblePositions.push([this.position[0] + 1, this.position[1] + 1]);
+            }
+            if (acceptableChars.indexOf(world.content[this.position[0] + 1][this.position[1]]) >= 0) {
+                possiblePositions.push([this.position[0] + 1, this.position[1]]);
+            }
+            if (acceptableChars.indexOf(world.content[this.position[0] + 1][this.position[1] - 1]) >= 0) {
+                possiblePositions.push([this.position[0] + 1, this.position[1] - 1]);
+            }
+            if (acceptableChars.indexOf(world.content[this.position[0]][this.position[1] - 1]) >= 0) {
+                possiblePositions.push([this.position[0], this.position[1] - 1]);
+            }
+            return possiblePositions[Math.floor(Math.random() * possiblePositions.length)];
+
+        }
+        Creatures.prototype.act = function(actionPosition) {
+            if (world.content[actionPosition[0]][actionPosition[1]] === this.eats) {
+                if (this instanceof Predators) {
+                    var eatableArray = plantEaters;
+                }
+                if (this instanceof PlantEaters) {
+                    var eatableArray = plants;
+                }
+                for (var j = 0; j < eatableArray.length; j++) {
+                    if (eatableArray[j].position[0] === actionPosition[0] && eatableArray[j].position[1] === actionPosition[1]) {
+                        var food = eatableArray[j];
+                        break;
+                    }
+                }
+                this.energy += food.energy;
+                eatableArray.splice(eatableArray.indexOf(food), 1);
+            }
+            world.content[actionPosition[0]] = world.content[actionPosition[0]].slice(0, actionPosition[1]) + this.value + world.content[actionPosition[0]].slice(actionPosition[1] + 1);
+            world.content[this.position[0]] = world.content[this.position[0]].slice(0, this.position[1]) + '_' + world.content[this.position[0]].slice(this.position[1] + 1);
+            this.position = actionPosition;
+        }
+        Creatures.prototype.reproduction = function() {
+            var childPosition = this.generatePosition(true);
+            if (this instanceof Predators) {
+                var speciesArray = predators;
+            }
+            if (this instanceof PlantEaters) {
+                var speciesArray = plantEaters;
+            }
+            if (this instanceof Plants) {
+                var speciesArray = plants;
+            }
+            if (childPosition !== undefined) {
+                if (this instanceof Predators) {
+                    var construction = Predators;
+                }
+                if (this instanceof PlantEaters) {
+                    var construction = PlantEaters;
+                }
+                if (this instanceof Plants) {
+                    var construction = Plants;
+                }
+                child = new construction(childPosition[0], childPosition[1]);
+                speciesArray.push(child);
+                this.energy /= 2;
+                world.content[childPosition[0]] = world.content[childPosition[0]].slice(0, childPosition[1]) + child.value + world.content[childPosition[0]].slice(childPosition[1] + 1);
+            }
+        }
+
+        function Plants(x, y) {
+            this.position = [x, y];
+            this.value = '*';
+            this.energy = 10 * Math.random().toFixed(1);
+            this.turn = function() {
+                this.energy += 0.5;
+                if (this.energy > 20) {
+                    this.reproduction();
+                }
+            }
+        }
+        Plants.prototype = new Creatures();
+        var plants = [];
+
+        function Predators(x, y) {
+            this.position = [x, y];
+            this.energy = 20 * Math.random().toFixed(1);
+            this.value = 'a';
+            this.eats = 'o';
+            this.turn = function() {
+                this.energy -= 0.4;
+                var newPosition = this.generatePosition();
+                if (newPosition !== undefined) {
+                    this.act(newPosition);
+                }
+                if (this.energy > 30) {
+                    this.reproduction();
+                }
+                if (this.energy < 0) {
+                    var dyingPredatorArrayPosition = predators.indexOf(this);
+                    predators.splice(dyingPredatorArrayPosition, 1);
+                    world.content[this.position[0]] = world.content[this.position[0]].slice(0, this.position[1]) + '_' + world.content[this.position[0]].slice(this.position[1] + 1);
+                }
+
+            }
+        }
+        Predators.prototype = new Creatures();
+
+        var predators = [];
+
+        function PlantEaters(x, y) {
+            this.position = [x, y];
+            this.energy = 20 * Math.random().toFixed(1);
+            this.value = 'o';
+            this.eats = '*';
+            this.turn = function() {
+                this.energy -= 0.5;
+                var newPosition = this.generatePosition();
+                if (newPosition !== undefined) {
+                    this.act(newPosition);
+                }
+                if (this.energy > 30) {
+                    this.reproduction();
+                }
+                if (this.energy < 0) {
+                    var dyingPlantEaterArrayPosition = plantEaters.indexOf(this);
+                    plantEaters.splice(dyingPlantEaterArrayPosition, 1);
+                    world.content[this.position[0]] = world.content[this.position[0]].slice(0, this.position[1]) + '_' + world.content[this.position[0]].slice(this.position[1] + 1);
+                }
+            }
+        }
+        PlantEaters.prototype = new Creatures();
+        var plantEaters = [];
+
+        function World(width, height) {
+            this.width = width;
+            this.height = height;
+            this.content = [];
+            this.day = 0;
+            this.build = function() {
+                for (var i = 0; i < height; i++) {
+                    var line = '';
+                    for (var j = 0; j < width; j++) {
+                        if (i < 1 || j == 0 || j == width - 1 || i > (height - 2)) {
+                            var rock = new Rock(i, j);
+                            rocks.push(rock);
+                            line += rock.value;
+                        } else {
+                            var cellContentDeterminant = Math.random();
+                            if (cellContentDeterminant < 0.05) {
+                                var rock = new Rock(i, j);
+                                rocks.push(rock);
+                                line += rock.value;
+                            } else if (cellContentDeterminant < 0.1) {
+                                var plantEater = new PlantEaters(i, j);
+                                plantEaters.push(plantEater);
+                                line += plantEater.value;
+                            } else if (cellContentDeterminant < 0.25) {
+                                var plant = new Plants(i, j);
+                                plants.push(plant);
+                                line += plant.value;
+                            } else if (cellContentDeterminant < 0.28) {
+                                var predator = new Predators(i, j);
+                                predators.push(predator);
+                                line += predator.value;
+                            } else {
+                                line += '_';
+                            }
+                        }
+                    }
+                    this.content.push(line);
+                }
+                document.body.innerHTML = this.content.join('<br>');
+            }
+            this.alive = function() {
+                for (var i = 0; i < plants.length; i++) {
+                    plants[i].turn();
+                }
+                for (var i = 0; i < plantEaters.length; i++) {
+                    plantEaters[i].turn();
+                }
+                for (var i = 0; i < predators.length; i++) {
+                    predators[i].turn();
+                }
+                this.day++;
+                document.body.innerHTML = this.content.join('<br>');
+                console.log('Day №' + this.day + ' plantEaters: ' + plantEaters.length + ' predators: ' + predators.length + ' plants: ' + plants.length);
+            }
+        }
+        var world = new World(40, 20);
+        world.build();
+        setInterval(function() {
+            world.alive();
+        }, 1000);
+        /*for debugging
+        for (var i = 0; plants.length; i++){if (plants[i].position[0] === actionPosition[0] && plants[i].position[1] === actionPosition[1]){console.log(plants.indexOf(plants[i]));}}*/
+    </script>
+</body>
+
+</html>
