@@ -19,32 +19,27 @@
             for (var key in obj2) {
                 keys2++;
             }
-            if (keys2 !== keys1) {
-                return false;
-            } else {
-                return true;
-            }
+            return keys2 === keys1;
+
         }
 
         function deepEqual(val1, val2) {
-            if (val1 === null || val2 === null) {
-                return false;
-            } else if (typeof(val1) === 'object' && typeof(val2) === 'object') {
+            /* if (val1 === null || val2 === null) {
+                 return false;
+             } else*/
+            if (typeof(val1) === 'object' && typeof(val2) === 'object') {
                 if (!(comparePropsQuantity(val1, val2))) {
                     return false;
                 }
                 for (var key in val1) {
+                    //console.log(key);
                     if (!deepEqual(val1[key], val2[key])) {
                         return false;
                     }
                 }
                 return true;
             } else {
-                if (val1 === val2) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return val1 === val2;
             }
 
         }
@@ -54,7 +49,18 @@
             },
             object: 2
         };
-        console.log(deepEqual(obj, {
+        console.log(!deepEqual({
+            val: '1'
+        }, {
+            val2: '1'
+        }));
+        console.log(!deepEqual({
+            val: '1'
+        }, {
+            val: '1',
+            val3: '2'
+        }));
+        console.log(!deepEqual(obj, {
             here: 1,
             object: 2
         }));
@@ -65,6 +71,7 @@
             object: 2
         }));
         console.log(deepEqual(obj, obj));
+        console.log(deepEqual(null, null));
     </script>
 </body>
 

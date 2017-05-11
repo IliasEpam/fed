@@ -24,6 +24,13 @@
             if (number.test(s))
                 console.log("Неправильно принято '" + s + "'");
         });
+
+        var sum = (function() {
+            var total = 0;
+            return function(param) {
+                return total += param;
+            }
+        }())
     </script>
 </body>
 
