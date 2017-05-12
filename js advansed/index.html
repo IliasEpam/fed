@@ -17,21 +17,16 @@
 <body>
     <div id="world">
     </div>
-    <button onclick="var alive = setInterval(world.alive.bind(world), 500);">Continue</button>
+    <button onclick="var alive = setInterval(world.alive.bind(world), 1000);">Continue</button>
+    <button onclick="world.alive()">Make one step</button>
     <button onclick="stopAlive()">Stop</button>
 
     <script>
-        function Rock(x, y) {
-            this.position = [x, y];
-            this.value = '#';
-        }
-        var rocks = [];
-
         function Creatures() {}
         Creatures.prototype.generatePosition = function(ifReproducing) {
             var varient;
             var acceptableChars = '_' + this.eats;
-            if (ifReproducing || this.energy > this.energyToReproduction * 0.7) {
+            if (ifReproducing || this.energy > this.energyToReproduction * 0.8) {
                 acceptableChars = '_';
             } else if (this.energy < this.energyToReproduction * 0.1) {
                 acceptableChars = this.eats;
@@ -196,15 +191,11 @@
                     var line = '';
                     for (var j = 0; j < width; j++) {
                         if (i < 1 || j == 0 || j == width - 1 || i > (height - 2)) {
-                            var rock = new Rock(i, j);
-                            rocks.push(rock);
-                            line += rock.value;
+                            line += '#';
                         } else {
                             var cellContentDeterminant = Math.random();
                             if (cellContentDeterminant < 0.05) {
-                                var rock = new Rock(i, j);
-                                rocks.push(rock);
-                                line += rock.value;
+                                line += '#';
                             } else if (cellContentDeterminant < 0.1) {
                                 var plantEater = new PlantEaters(i, j);
                                 plantEaters.push(plantEater);
@@ -243,9 +234,6 @@
         }
         var world = new World(40, 20);
         world.build();
-        /* setInterval(function() {
-             world.alive();
-         }, 200);*/
         var alive = setInterval(world.alive.bind(world), 1000);
 
         function stopAlive() {
