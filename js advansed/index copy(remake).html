@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            padding: 20px;
+        }
+        
+        #world {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="world">
+    </div>
+    <button onclick="var alive = setInterval(world.alive.bind(world), 1000);">Continue</button>
+    <button onclick="world.alive()">Make one step</button>
+    <button onclick="stopAlive()">Stop</button>
+
+    <script>
+        function Creatures() {
+            this.starvingDeterminant = 0.1;
+            this.notHungryDeterminant = 0.8;
+        }
+        Creatures.prototype.generatePosition = function(ifReproducing) {
+            var newPosition;
+            var acceptableChars = '_' + this.eats;
+            if (ifReproducing || this.energy > this.energyToReproduction * this.notHungryDeterminant) {
+                acceptableChars = '_';
+            } else if (this.energy < this.energyToReproduction * this.starvingDeterminant) {
+                acceptableChars = this.eats;
+                if (!(this.findPossiblePositions(acceptableChars))) {
+                    acceptableChars = '_';
+                }
+            }
+            newPosition = this.findPossiblePositions(acceptableChars);
+            return newPosition;
+        }
+        Creatures.prototype.findPossiblePositions = function(acceptableChars) {
+            var possiblePositions = [];
+            var x = this.position[1];
+            var y = this.position[0];
+            if (acceptableChars.indexOf(world.content[y - 1][x - 1]) >= 0) {
+                possiblePositions.push([y - 1, x - 1]);
+            }
+            if (acceptableChars.indexOf(world.content[y - 1][x]) >= 0) {
+                possiblePositions.push([y - 1, x]);
+            }
+            if (acceptableChars.indexOf(world.content[y - 1][x + 1]) >= 0) {
+                possiblePositions.push([y - 1, x + 1]);
+            }
+            if (acceptableChars.indexOf(world.content[y][x + 1]) >= 0) {
+                possiblePositions.push([y, x + 1]);
+            }
+            if (acceptableChars.indexOf(world.content[y + 1][x + 1]) >= 0) {
+                possiblePositions.push([y + 1, x + 1]);
+            }
+            if (acceptableChars.indexOf(world.content[y + 1][x]) >= 0) {
+                possiblePositions.push([y + 1, x]);
+            }
+            if (acceptableChars.indexOf(world.content[y + 1][x - 1]) >= 0) {
+                possiblePositions.push([y + 1, x - 1]);
+            }
+            if (acceptableChars.indexOf(world.content[y][x - 1]) >= 0) {
+                possiblePositions.push([y, x - 1]);
+            }
+            return possiblePositions[Math.floor(Math.random() * possiblePositions.length)];
+
+        }
+        Creatures.prototype.act = function(actionPosition) {
+            if (world.content[actionPosition[0]][actionPosition[1]] === this.eats) {
+                for (var j = 0; j < world.creatures.length; j++) {
+                    if (world.creatures[j].position[0] === actionPosition[0] && world.creatures[j].position[1] === actionPosition[1]) {
+                        var food = world.creatures[j];
+                        break;
+                    }
+                }
+                this.energy += food.energy;
+                world.creatures.splice(world.creatures.indexOf(food), 1);
+            }
+            world.content[actionPosition[0]][actionPosition[1]] = this.value;
+            world.content[this.position[0]][this.position[1]] = '_';
+            this.position = actionPosition;
+        }
+        Creatures.prototype.reproduction = function() {
+            var childPosition = this.generatePosition(true);
+            if (childPosition !== undefined) {
+                child = new this.Construction(childPosition[0], childPosition[1]);
+                world.creatures.push(child);
+                this.energy /= 2;
+                world.content[childPosition[0]][childPosition[1]] = child.value;
+            }
+        }
+
+        function Plants(x, y) {
+            this.position = [x, y];
+            this.Construction = Plants;
+            this.value = '*';
+            this.energyToReproduction = 20;
+            this.energy = this.energyToReproduction * Math.random().toFixed(1);
+            this.energyPerTurn = 0.4;
+            this.turn = function() {
+                this.energy += this.energyPerTurn;
+                if (this.energy > this.energyToReproduction) {
+                    this.reproduction();
+                }
+            }
+        }
+        Plants.prototype = new Creatures();
+
+        function Predators(x, y) {
+            Creatures.call(this);
+            this.position = [x, y];
+            this.Construction = Predators;
+            this.value = 'a';
+            this.eats = 'o';
+            this.energyToReproduction = 40;
+            this.energy = this.energyToReproduction * Math.random().toFixed(1);
+            this.energyPerTurn = 0.6;
+            this.turn = function() {
+                this.energy -= this.energyPerTurn;
+                var newPosition = this.generatePosition();
+                if (newPosition !== undefined) {
+                    this.act(newPosition);
+                }
+                if (this.energy > this.energyToReproduction) {
+                    this.reproduction();
+                }
+                if (this.energy < 0) {
+                    var dyingPredatorArrayPosition = world.creatures.indexOf(this);
+                    world.creatures.splice(dyingPredatorArrayPosition, 1);
+                    world.content[this.position[0]][this.position[1]] = '_';
+                }
+
+            }
+        }
+        Predators.prototype = new Creatures();
+
+        function PlantEaters(x, y) {
+            Creatures.call(this);
+            this.position = [x, y];
+            this.Construction = PlantEaters;
+            this.energyToReproduction = 40;
+            this.energy = this.energyToReproduction * Math.random().toFixed(1);
+            this.value = 'o';
+            this.eats = '*';
+            this.energyPerTurn = 0.2;
+            this.turn = function() {
+                this.energy -= this.energyPerTurn;
+                var newPosition = this.generatePosition();
+                if (newPosition !== undefined) {
+                    this.act(newPosition);
+                }
+                if (this.energy > this.energyToReproduction) {
+                    this.reproduction();
+                }
+                if (this.energy < 0) {
+                    var dyingPlantEaterArrayPosition = world.creatures.indexOf(this);
+                    world.creatures.splice(dyingPlantEaterArrayPosition, 1);
+                    world.content[this.position[0]][this.position[1]] = '_';
+                }
+            }
+        }
+        PlantEaters.prototype = new Creatures();
+
+        function World(width, height) {
+            this.width = width;
+            this.height = height;
+            this.content = [];
+            this.day = 0;
+            this.container = document.querySelector('#world');
+            this.coefficientsStonesAmount = 0.05;
+            this.coefficientsPlantEatersAmount = 0.1;
+            this.coefficientsPlantsAmount = 0.25;
+            this.coefficientsPreadtorsAmount = 0.28;
+            this.creatures = [];
+            this.build = function() {
+                for (var i = 0; i < height; i++) {
+                    var line = [];
+                    for (var j = 0; j < width; j++) {
+                        if (i < 1 || j == 0 || j == width - 1 || i > (height - 2)) {
+                            line.push('#');
+                        } else {
+                            var cellContentDeterminant = Math.random();
+                            if (cellContentDeterminant < this.coefficientsStonesAmount) {
+                                line.push('#');
+                            } else if (cellContentDeterminant < this.coefficientsPlantEatersAmount) {
+                                var plantEater = new PlantEaters(i, j);
+                                this.creatures.push(plantEater);
+                                line.push(plantEater.value);
+                            } else if (cellContentDeterminant < this.coefficientsPlantsAmount) {
+                                var plant = new Plants(i, j);
+                                this.creatures.push(plant);
+                                line.push(plant.value);
+                            } else if (cellContentDeterminant < this.coefficientsPreadtorsAmount) {
+                                var predator = new Predators(i, j);
+                                this.creatures.push(predator);
+                                line.push(predator.value);
+                            } else {
+                                line.push('_');
+                            }
+                        }
+                    }
+                    this.content.push(line);
+                }
+                var view = '';
+                for (var j = 0; j < this.content.length; j++) {
+                    view += this.content[j].join('') + '<br>';
+                }
+                this.container.innerHTML = view;
+            }
+            this.alive = function() {
+                var predatorsAmount = 0;
+                var plantsAmount = 0;
+                var plantEatersAmount = 0;
+                for (var i = 0; i < this.creatures.length; i++) {
+                    this.creatures[i].turn();
+                }
+                for (var i = 0; i < world.creatures.length; i++) {
+                    if (this.creatures[i] instanceof Predators) {
+                        predatorsAmount++;
+                    } else if (this.creatures[i] instanceof Plants) {
+                        plantsAmount++;
+                    } else if (this.creatures[i] instanceof PlantEaters) {
+                        plantEatersAmount++;
+                    }
+                }
+                this.day++;
+                var view = '';
+                for (var j = 0; j < this.content.length; j++) {
+                    view += this.content[j].join('') + '<br>';
+                }
+                this.container.innerHTML = view;
+                console.log('Day №' + this.day + ' plantEaters: ' + plantEatersAmount + ' predators: ' + predatorsAmount + ' plants: ' + plantsAmount);
+            }
+        }
+        var world = new World(40, 20);
+        world.build();
+        var alive = setInterval(world.alive.bind(world), 1000);
+
+        function stopAlive() {
+            clearInterval(alive);
+        }
+    </script>
+</body>
+
+</html>
