@@ -17,7 +17,7 @@
 <body>
     <div id="world">
     </div>
-    <button onclick="var alive = setInterval(world.alive.bind(world), 1000);">Continue</button>
+    <button onclick="var alive = setInterval(world.alive.bind(world), 500);">Continue</button>
     <button onclick="world.alive()">Make one step</button>
     <button onclick="stopAlive()">Stop</button>
 
@@ -240,7 +240,7 @@
         }
         var world = new World(40, 20);
         world.build();
-        var alive = setInterval(world.alive.bind(world), 1000);
+        var alive = setInterval(world.alive.bind(world), 500);
 
         function stopAlive() {
             clearInterval(alive);
