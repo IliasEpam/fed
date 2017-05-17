@@ -9,22 +9,25 @@ class Person extends Animal {
         this.gender = gender;
     }
     getFirstName() {
-        return this.firstName + ' ';
+        return this.firstName;
     }
     getLastName() {
         return this.lastName;
     }
+
     getGender() {
         return this.gender;
     }
+    static MALE = 'male';
+    static FEMALE = 'female';
 
 }
-Person.MALE = 'male';
+/*Person.MALE = 'male';
 Person.FEMALE = 'female';
-
+*/
 let petr = new Person('Petr', 'Petrov', 20, Person.MALE);
 console.log(petr.getAge());
-console.log(petr.getFirstName() + petr.getLastName());
+console.log(petr.getFirstName() + ' ' + petr.getLastName());
 console.log(petr.getGender() === Person.MALE ? 'male' : 'female');
 
 
@@ -34,7 +37,7 @@ console.log(petr.getGender() === Person.MALE ? 'male' : 'female');
 
 let arrowFunc = (a, b) => a + b;
 console.log('sum = ' + arrowFunc(2, 6));
-let objFunc = () => new Object();
+let objFunc = () => ({});
 console.log('new object: ' + objFunc());
 
 class People {
@@ -62,18 +65,41 @@ function makeCharIterator(str) {
     for (let i = 0; i < str.length; i++) {
         arr.push(str[i]);
     }
-    var nextIndex = 0;
-    return {
-        next: function() {
-            return nextIndex < arr.length ? { done: false, char: arr[nextIndex++] } : { done: true };
+    let nextIndex = 0;
+    let iterator = {
+        startChar: 0,
+        endChar: arr.length - 1
+    }
+    iterator[Symbol.iterator] = function() {
+        let current = this.startChar;
+        let last = this.endChar;
+        return {
+            next() {
+                if (current <= last) {
+                    return {
+                        done: false,
+                        value: { char: arr[current++] }
+                    };
+                } else {
+                    return {
+                        done: true
+                    };
+                }
+            }
         }
     }
+
+    return iterator;
 }
 let iterator = makeCharIterator('some');
 console.log(iterator);
+for (let info of iterator) {
+    console.log(info);
+}
 
-console.log(iterator.next());
-console.log(iterator.next());
-console.log(iterator.next());
-console.log(iterator.next());
-console.log(iterator.next());
+let iterator2 = makeCharIterator('other');
+console.log(iterator2.next());
+console.log(iterator2.next());
+console.log(iterator2.next());
+console.log(iterator2.next());
+console.log(iterator2.next());
