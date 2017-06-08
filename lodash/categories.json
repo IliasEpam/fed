@@ -1,0 +1,26 @@
+[{
+    "id": 0,
+    "name": "some-name",
+    "description": "some-description",
+    "img": "some.jpg"
+}, {
+    "id": 1,
+    "name": "some-name1",
+    "description": "some-description1",
+    "img": "some1.jpg"
+}, {
+    "id": 2,
+    "name": "some-name2",
+    "description": "some-description2",
+    "img": "some2.jpg"
+}, {
+    "id": 3,
+    "name": "some-name3",
+    "description": "some-description3",
+    "img": "some3.jpg"
+}, {
+    "id": 4,
+    "name": "some-name4",
+    "description": "some-description4",
+    "img": "some4.jpg"
+}]
