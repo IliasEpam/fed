@@ -39,4 +39,4 @@ _.forEach(categories, function(category) {
     category.list = list;
 });
 console.log(categories);
-fs.writeFile('result1.json', JSON.stringify(categories), handleError);
+fs.writeFile('result1.json', JSON.stringify(categories, ' ', 4), handleError);
